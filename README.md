@@ -26,9 +26,12 @@ compatible.
 
 ## Usage ##
 
-The **File > Recently Closed** sub-menu contains the list of recently-closed files. To reopen one of these files, select the corresponding menu item.
+The **File > Recently Closed** sub-menu contains the list of
+recently-closed files. To reopen one of these files, select the
+corresponding menu item.
 
-<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> will also reopen the most recently closed file.
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd> will also reopen the most
+recently closed file.
 
 ## Credits ##
 
