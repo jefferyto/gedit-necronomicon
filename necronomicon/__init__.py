@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# necronomicon.py
+# __init__.py
 # This file is part of Necronomicon, a plugin for gedit
 #
 # Copyright (C) 2013 Jeffery To <jeffery.to@gmail.com>
@@ -20,6 +20,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import GObject, Gtk, Gio, Gedit
+from .utils import connect_handlers, disconnect_handlers
 
 # we fake window-added / window-removed signals
 # since Gedit.App wasn't a Gtk.Application until gedit 3.8
@@ -72,8 +73,6 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 
 	APP_HELPER = 'NecronomiconPluginAppHelper'
 
-	HANDLER_IDS = 'NecronomiconPluginHandlerIds'
-
 	TAB_SUMMARY = 'NecronomiconPluginTabSummary'
 
 	def __init__(self):
@@ -88,7 +87,7 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 		settings = Gio.Settings.new(self.MAX_RECENTS_SETTINGS_SCHEMA)
 		max_recents = settings.get_uint('max-recents')
 
-		self._connect_handlers(helper, ('window-added', 'window-removed'), 'app')
+		connect_handlers(self, helper, ('window-added', 'window-removed'), 'app')
 
 		self._closed_files = []
 		self._max_closed_files = max_recents * 10
@@ -104,7 +103,7 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 		for window in app.get_windows():
 			self.on_app_window_removed(app, window)
 
-		self._disconnect_handlers(getattr(app, self.APP_HELPER))
+		disconnect_handlers(self, getattr(app, self.APP_HELPER))
 		delattr(app, self.APP_HELPER)
 
 		self._closed_files = None
@@ -140,7 +139,7 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 				</ui>"""
 			menu_ui_id = ui_manager.add_ui_from_string(menu_ui_str)
 
-			self._connect_handlers(window, ('tab-added', 'tab-removed'), 'window')
+			connect_handlers(self, window, ('tab-added', 'tab-removed'), 'window')
 
 			self._windows[window] = {
 				'menu_action_group': menu_action_group,
@@ -163,7 +162,7 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 			for doc in window.get_documents():
 				self.on_window_tab_removed(window, Gedit.Tab.get_from_document(doc))
 
-			self._disconnect_handlers(window)
+			disconnect_handlers(self, window)
 
 			update_menu_id = data['update_menu_id']
 			if update_menu_id:
@@ -184,11 +183,11 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 
 		doc = tab.get_document()
 		setattr(doc, self.TAB_SUMMARY, self._get_tab_summary(tab))
-		self._connect_handlers(doc, ('loaded', 'saved'), self.on_document_loaded_saved)
+		connect_handlers(self, doc, ('loaded', 'saved'), self.on_document_loaded_saved)
 
 	def on_window_tab_removed(self, window, tab):
 		doc = tab.get_document()
-		self._disconnect_handlers(doc)
+		disconnect_handlers(self, doc)
 		delattr(doc, self.TAB_SUMMARY)
 
 		self._file_closed(tab)
@@ -297,7 +296,7 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 				action.set_always_show_image(True)
 				if content_type:
 					action.set_gicon(Gio.content_type_get_icon(content_type))
-				self._connect_handlers(action, ('activate',), 'reopen_action', window, f)
+				connect_handlers(self, action, ('activate',), 'reopen_action', window, f)
 
 				if num == 0:
 					action_group.add_action_with_accel(action, self.REOPEN_ACCELERATOR)
@@ -330,7 +329,7 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 			data['reopen_ui_id'] = 0
 
 		for action in action_group.list_actions():
-			self._disconnect_handlers(action)
+			disconnect_handlers(self, action)
 			action_group.remove_action(action)
 
 	def on_reopen_action_activate(self, action, window, summary):
@@ -338,24 +337,3 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 		Gedit.commands_load_location(
 			window, summary['location'], summary['encoding'],
 			summary['line_pos'] + 1, summary['column_pos'] + 1)
-
-	def _connect_handlers(self, obj, signals, m, *args):
-		HANDLER_IDS = self.HANDLER_IDS
-		l_ids = getattr(obj, HANDLER_IDS) if hasattr(obj, HANDLER_IDS) else []
-
-		for signal in signals:
-			if type(m).__name__ == 'str':
-				method = getattr(self, 'on_' + m + '_' + signal.replace('-', '_').replace('::', '_'))
-			else:
-				method = m
-			l_ids.append(obj.connect(signal, method, *args))
-
-		setattr(obj, HANDLER_IDS, l_ids)
-
-	def _disconnect_handlers(self, obj):
-		HANDLER_IDS = self.HANDLER_IDS
-		if hasattr(obj, HANDLER_IDS):
-			for l_id in getattr(obj, HANDLER_IDS):
-				obj.disconnect(l_id)
-
-			delattr(obj, HANDLER_IDS)
