@@ -9,8 +9,7 @@ at the [project issue tracker][].
 
 ## Requirements ##
 
-Tested with gedit 3.6, though earlier versions of gedit 3 should also be
-compatible.
+This plugin requires gedit 3.
 
 ## Installation ##
 

@@ -85,7 +85,9 @@ class NecronomiconPluginAppActivatable(GObject.Object, Gedit.AppActivatable):
 		setattr(app, self.APP_HELPER, helper)
 
 		settings = Gio.Settings.new(self.MAX_RECENTS_SETTINGS_SCHEMA)
-		max_recents = settings.get_uint('max-recents')
+		# Gio.Settings under GNOME 3.0 doesn't have get_uint()
+		value = settings.get_value('max-recents')
+		max_recents = value.get_uint32()
 
 		connect_handlers(self, helper, ('window-added', 'window-removed'), 'app')
 
