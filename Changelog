@@ -1,2 +1,5 @@
+TBD ():
+* Use python-gtk-utils for some plumbing
+
 v0.1.0 (2013-05-08):
 * Initial release
