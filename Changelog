@@ -1,2 +1,6 @@
+v0.1.1 (2017-09-04):
+* Made compatible with gedit 3.0
+* Use python-gtk-utils for some plumbing
+
 v0.1.0 (2013-05-08):
 * Initial release
