@@ -1,4 +1,4 @@
-TBD ():
+v0.1.1 (2017-09-04):
 * Made compatible with gedit 3.0
 * Use python-gtk-utils for some plumbing
 

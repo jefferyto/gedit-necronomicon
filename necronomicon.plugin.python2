@@ -8,4 +8,4 @@ Description=Reopen recently-closed files ("undo close tab")
 Authors=Jeffery To <jeffery.to@gmail.com>
 Copyright=Copyright © 2013 Jeffery To
 Website=https://github.com/jefferyto/gedit-necronomicon
-Version=0.1.0
+Version=0.1.1

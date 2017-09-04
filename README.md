@@ -2,10 +2,15 @@
 
 Reopen recently-closed files ("undo close tab")  
 <https://github.com/jefferyto/gedit-necronomicon>  
-v0.1.0
+v0.1.1
 
 All bug reports, feature requests and miscellaneous comments are welcome
 at the [project issue tracker][].
+
+## No Longer Maintained ##
+
+Since gedit 3.12 added the ability to reopen recently-closed tabs, this
+plugin is no longer necessary and will not receive any new updates.
 
 ## Requirements ##
 
